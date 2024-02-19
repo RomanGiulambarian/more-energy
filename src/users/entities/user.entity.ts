@@ -1,10 +1,10 @@
 import { Entity, Column, OneToMany, JoinColumn } from 'typeorm';
-import { CommonEntity } from './common.entity';
-import { СoachToUser } from './coach-to-user.entity';
-import { Evaluation } from './evaluation.entity';
+import { CommonEntity } from '../../db/entities/common.entity';
+import { СoachToUser } from '../../db/entities/coach-to-user.entity';
+import { Evaluation } from '../../db/entities/evaluation.entity';
 import { UserRole } from 'src/users/enums';
-import { HealthVision } from './health-vision.entyty';
-import { Via } from './via.entity';
+import { HealthVision } from '../../db/entities/health-vision.entyty';
+import { Via } from '../../db/entities/via.entity';
 
 @Entity()
 export class User extends CommonEntity {

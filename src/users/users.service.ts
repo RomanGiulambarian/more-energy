@@ -1,26 +1,95 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { User } from './entities/user.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return this.userRepository.create(createUserDto).save();
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { id },
+    });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    email: string,
+  ): Promise<UpdateResult> {
+    const userIsValid = await this.validateUser(updateUserDto, email);
+    const hashPassword = updateUserDto.newPassword
+      ? await bcrypt.hash(updateUserDto.newPassword, 5)
+      : userIsValid.password;
+
+    const updateUser = await this.userRepository.update(id, {
+      photoPath: updateUserDto.photoPath,
+      name: updateUserDto.name,
+      surname: updateUserDto.email,
+      email: updateUserDto.email,
+      phone: updateUserDto.phone,
+      password: hashPassword,
+      role: updateUserDto.role,
+      isActive: updateUserDto.isActive,
+    });
+
+    return updateUser;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string): Promise<void> {
+    await this.userRepository.delete(id);
+  }
+
+  // async getUserByEmail(email: string): Promise<User> {
+  //   return await this.userRepository.findOne({
+  //     relations: ['posts'],
+  //     where: { email },
+  //   });
+  // }
+
+  private async getUserByEmailPrivate(email: string): Promise<User> {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .addSelect('user.password')
+      .getOne();
+  }
+
+  async validateUser(userDto: CreateUserDto | UpdateUserDto, email?: string) {
+    let userEmail: string = email ?? userDto.email;
+    const user = await this.getUserByEmailPrivate(userEmail);
+
+    if (!user) {
+      throw new UnauthorizedException({
+        message: 'Пользователь не найден',
+      });
+    }
+
+    const passwordEquals = await bcrypt.compare(
+      userDto.password,
+      user.password,
+    );
+
+    if (passwordEquals) {
+      return user;
+    }
+
+    throw new UnauthorizedException({
+      message: 'Некорректный емеил или пароль',
+    });
   }
 }

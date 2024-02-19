@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/db/entities/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { СoachToUser } from './db/entities/coach-to-user.entity';
 import { Evaluation } from './db/entities/evaluation.entity';
 import { Via } from './db/entities/via.entity';
 import { HealthVision } from './db/entities/health-vision.entyty';
+import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import { HealthVision } from './db/entities/health-vision.entyty';
         password: configService.getOrThrow('POSTGRES_PASSWORD'),
         entities: [User, СoachToUser, Evaluation, Via, HealthVision],
         synchronize: true,
+        migrations: [],
       }),
     }),
   ],

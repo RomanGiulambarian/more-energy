@@ -1,34 +1,65 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Param,
+  Delete,
+  NotFoundException,
+  Put,
+  Res,
+  Req,
+  Post,
+} from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { Response } from 'express';
+import { extendedRequest } from 'src/common/types/global.types';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('users')
+@Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly userService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async getAll() {
+    return await this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async getById(@Param('id') id: string) {
+    const user = await this.userService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    } else {
+      return user;
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: extendedRequest,
+  ) {
+    return await this.userService.update(id, updateUserDto, req.user.email);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string, @Res() res: Response) {
+    const user = await this.userService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User does not exist!');
+    }
+
+    await this.userService.remove(id);
+
+    res.status(204).send().end();
   }
 }
