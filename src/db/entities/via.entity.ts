@@ -3,12 +3,12 @@ import { CommonEntity } from './common.entity';
 import { User } from './user.entity';
 
 @Entity()
-export class HealthVision extends CommonEntity {
+export class Via extends CommonEntity {
   @ManyToOne(() => User, (user) => user.id)
   user: User;
 
   @Column()
-  topValues: string;
+  courage: number;
 
   @Column()
   forgiveness: number;

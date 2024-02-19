@@ -3,22 +3,22 @@ import { CommonEntity } from './common.entity';
 import { User } from './user.entity';
 
 @Entity()
-export class Evaluation extends CommonEntity {
+export class HealthVision extends CommonEntity {
   @ManyToOne(() => User, (user) => user.id)
   user: User;
 
   @Column()
-  courage: number;
+  topValues: string;
 
   @Column()
-  forgiveness: number;
+  iWant: number;
 
   @Column()
-  creativity: string;
+  whyWant: string;
 
   @Column()
-  love: string;
+  willing: string;
 
   @Column()
-  spirituality: string;
+  visionStatement: string;
 }
