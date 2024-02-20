@@ -1,11 +1,11 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { CommonEntity } from './common.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class HealthVision extends CommonEntity {
-  @ManyToOne(() => User, (user) => user.id)
-  user: User;
+  @OneToMany(() => User, (user) => user.healthVision)
+  users: User[];
 
   @Column()
   topValues: string;

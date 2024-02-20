@@ -1,9 +1,9 @@
-import { Entity, ManyToOne } from 'typeorm';
+import { Entity, OneToMany } from 'typeorm';
 import { CommonEntity } from './common.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class СoachToUser extends CommonEntity {
-  @ManyToOne(() => User, (user) => user.coaches)
-  user: User;
+  @OneToMany(() => User, (user) => user.coache)
+  users: User[];
 }

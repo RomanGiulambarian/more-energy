@@ -1,11 +1,11 @@
-import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { CommonEntity } from './common.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Evaluation extends CommonEntity {
-  @ManyToOne(() => User, (user) => user.id)
-  user: User;
+  @OneToMany(() => User, (user) => user.evaluation)
+  users: User[];
 
   @Column()
   weight: number;
