@@ -5,7 +5,7 @@ import { Evaluation } from '../../db/entities/evaluation.entity';
 import { UserRole } from 'src/users/enums';
 import { HealthVision } from '../../db/entities/health-vision.entyty';
 import { Via } from '../../db/entities/via.entity';
-import { Favorites } from 'src/db/entities/favorites.entity';
+import { Favorites } from 'src/favorites/entities/favorites.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -40,7 +40,7 @@ export class User extends CommonEntity {
   @Column()
   isActive: string;
 
-  @OneToMany(() => СoachToUser, (coach) => coach.id)
+  @ManyToOne(() => СoachToUser, (coach) => coach.id)
   coache: СoachToUser;
 
   @ManyToOne(() => Evaluation, (evaluation) => evaluation.id)
@@ -51,4 +51,7 @@ export class User extends CommonEntity {
 
   @ManyToOne(() => Via, (via) => via.id)
   via: Via;
+
+  @OneToMany(() => Favorites, (favorites) => favorites.user)
+  favorites: Favorites[];
 }

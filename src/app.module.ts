@@ -2,11 +2,10 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { СoachToUser } from './db/entities/coach-to-user.entity';
-import { Evaluation } from './db/entities/evaluation.entity';
-import { Via } from './db/entities/via.entity';
-import { HealthVision } from './db/entities/health-vision.entyty';
-import { User } from './users/entities/user.entity';
+import { ExerciseModule } from './exercise/exercise.module';
+import { ExerciseStepsModule } from './exercise-steps/exercise-steps.module';
+import { exportEntites } from './db';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -23,11 +22,14 @@ import { User } from './users/entities/user.entity';
         port: configService.getOrThrow('POSTGRES_PORT'),
         username: configService.getOrThrow('POSTGRES_USER'),
         password: configService.getOrThrow('POSTGRES_PASSWORD'),
-        entities: [User, СoachToUser, Evaluation, Via, HealthVision],
+        entities: exportEntites,
         synchronize: false,
         migrations: ['./db/migrations/*.{js,ts}'],
       }),
     }),
+    ExerciseModule,
+    ExerciseStepsModule,
+    FavoritesModule,
   ],
 })
 export class AppModule {}
