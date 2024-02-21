@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { UsersModule } from './users/users.module';
 import { СoachToUser } from './db/entities/coach-to-user.entity';
 import { Evaluation } from './db/entities/evaluation.entity';
 import { Via } from './db/entities/via.entity';
@@ -11,9 +12,7 @@ import { User } from './users/entities/user.entity';
 @Module({
   imports: [
     UsersModule,
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-    }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -24,7 +23,6 @@ import { User } from './users/entities/user.entity';
         username: configService.getOrThrow('POSTGRES_USER'),
         password: configService.getOrThrow('POSTGRES_PASSWORD'),
         entities: [User, СoachToUser, Evaluation, Via, HealthVision],
-        synchronize: false,
         migrations: ['./db/migrations/*.{js,ts}'],
       }),
     }),

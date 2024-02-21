@@ -9,6 +9,7 @@ import {
   Res,
   Req,
   Post,
+  HttpCode,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
@@ -36,9 +37,9 @@ export class UsersController {
 
     if (!user) {
       throw new NotFoundException('User does not exist');
-    } else {
-      return user;
     }
+
+    return user;
   }
 
   @Put(':id')
@@ -51,6 +52,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id') id: string, @Res() res: Response) {
     const user = await this.userService.findOne(id);
 
@@ -58,8 +60,8 @@ export class UsersController {
       throw new NotFoundException('User does not exist!');
     }
 
-    await this.userService.remove(id);
+    this.userService.softDelete(id);
 
-    res.status(204).send().end();
+    return id;
   }
 }

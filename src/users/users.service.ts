@@ -1,10 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
+
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,16 +17,16 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    return this.userRepository.create(createUserDto).save();
+  create(createUserDto: CreateUserDto) {
+    return this.userRepository.save(this.userRepository.create(createUserDto));
   }
 
-  async findAll(): Promise<User[]> {
+  findAll() {
     return this.userRepository.find();
   }
 
-  async findOne(id: string): Promise<User> {
-    return await this.userRepository.findOne({
+  findOne(id: string) {
+    return this.userRepository.findOne({
       where: { id },
     });
   }
@@ -36,7 +41,7 @@ export class UsersService {
       ? await bcrypt.hash(updateUserDto.newPassword, 5)
       : userIsValid.password;
 
-    const updateUser = await this.userRepository.update(id, {
+    return await this.userRepository.update(id, {
       photoPath: updateUserDto.photoPath,
       name: updateUserDto.name,
       surname: updateUserDto.email,
@@ -46,23 +51,26 @@ export class UsersService {
       role: updateUserDto.role,
       isActive: updateUserDto.isActive,
     });
-
-    return updateUser;
   }
 
-  async remove(id: string): Promise<void> {
-    await this.userRepository.delete(id);
+  softDelete(id: string) {
+    const user = this.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
+    this.userRepository.softDelete(id);
   }
 
-  // async getUserByEmail(email: string): Promise<User> {
-  //   return await this.userRepository.findOne({
-  //     relations: ['posts'],
-  //     where: { email },
-  //   });
-  // }
+  getUserByEmail(email: string) {
+    return this.userRepository.findOne({
+      where: { email },
+    });
+  }
 
-  private async getUserByEmailPrivate(email: string): Promise<User> {
-    return await this.userRepository
+  private getUserByEmailPrivate(email: string) {
+    return this.userRepository
       .createQueryBuilder('user')
       .where('user.email = :email', { email })
       .addSelect('user.password')

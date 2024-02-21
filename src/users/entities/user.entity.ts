@@ -5,7 +5,6 @@ import { Evaluation } from '../../db/entities/evaluation.entity';
 import { UserRole } from 'src/users/enums';
 import { HealthVision } from '../../db/entities/health-vision.entyty';
 import { Via } from '../../db/entities/via.entity';
-import { Favorites } from 'src/db/entities/favorites.entity';
 
 @Entity()
 export class User extends CommonEntity {
