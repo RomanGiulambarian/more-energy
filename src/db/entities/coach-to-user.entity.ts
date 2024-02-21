@@ -1,9 +1,14 @@
-import { Entity, OneToMany } from 'typeorm';
-import { CommonEntity } from './common.entity';
+import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
-export class СoachToUser extends CommonEntity {
-  @OneToMany(() => User, (user) => user.coache)
-  users: User[];
+export class СoachToUser {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => User, (user) => user.id)
+  userId: User;
+
+  @ManyToOne(() => User, (user) => user.id)
+  coachId: User;
 }

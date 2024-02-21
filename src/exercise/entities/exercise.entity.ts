@@ -2,11 +2,15 @@ import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
 import { CommonEntity } from 'src/db/entities/common.entity';
 import { ExerciseSteps } from 'src/exercise-steps/entities/exercise-steps.entity';
 import { Favorites } from 'src/favorites/entities/favorites.entity';
+import { Media } from 'src/media/entities/media.entity';
 
 @Entity()
 export class Exercise extends CommonEntity {
   @OneToMany(() => Favorites, (favorite) => favorite.content)
   favorites: Favorites[];
+
+  @OneToMany(() => Media, (media) => media.exercise)
+  media: Media[];
 
   @ManyToOne(() => ExerciseSteps, (exerciseSteps) => exerciseSteps.exercise)
   exerciseSteps: ExerciseSteps[];
@@ -16,12 +20,6 @@ export class Exercise extends CommonEntity {
 
   @Column()
   description: string;
-
-  @Column()
-  thumbPath: string;
-
-  @Column()
-  postDate: Date;
 
   @Column()
   tip: string;

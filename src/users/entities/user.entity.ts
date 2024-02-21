@@ -1,11 +1,18 @@
-import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToMany,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { CommonEntity } from '../../db/entities/common.entity';
 import { СoachToUser } from '../../db/entities/coach-to-user.entity';
-import { Evaluation } from '../../db/entities/evaluation.entity';
 import { UserRole } from 'src/users/enums';
-import { HealthVision } from '../../db/entities/health-vision.entyty';
-import { Via } from '../../db/entities/via.entity';
+import { HealthVision } from './health-vision.entyty';
+import { Via } from './via.entity';
 import { Favorites } from 'src/favorites/entities/favorites.entity';
+import { Evaluation } from './evaluation.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -40,18 +47,9 @@ export class User extends CommonEntity {
   @Column()
   isActive: string;
 
-  @ManyToOne(() => СoachToUser, (coach) => coach.id)
-  coache: СoachToUser;
+  @OneToMany(() => СoachToUser, (coach) => coach.coachId)
+  coaches: User[];
 
-  @ManyToOne(() => Evaluation, (evaluation) => evaluation.id)
-  evaluation: Evaluation;
-
-  @ManyToOne(() => HealthVision, (healthVision) => healthVision.id)
-  healthVision: HealthVision;
-
-  @ManyToOne(() => Via, (via) => via.id)
-  via: Via;
-
-  @OneToMany(() => Favorites, (favorites) => favorites.user)
-  favorites: Favorites[];
+  @OneToMany(() => СoachToUser, (coach) => coach.userId)
+  clients: User[];
 }

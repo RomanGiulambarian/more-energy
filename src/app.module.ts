@@ -6,12 +6,17 @@ import { ExerciseModule } from './exercise/exercise.module';
 import { ExerciseStepsModule } from './exercise-steps/exercise-steps.module';
 import { exportEntites } from './db';
 import { FavoritesModule } from './favorites/favorites.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'path';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: path.resolve(__dirname),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -27,9 +32,11 @@ import { FavoritesModule } from './favorites/favorites.module';
         migrations: ['./db/migrations/*.{js,ts}'],
       }),
     }),
+    UsersModule,
     ExerciseModule,
     ExerciseStepsModule,
     FavoritesModule,
+    MediaModule,
   ],
 })
 export class AppModule {}
