@@ -54,12 +54,12 @@ export class UsersService {
     await this.userRepository.delete(id);
   }
 
-  // async getUserByEmail(email: string): Promise<User> {
-  //   return await this.userRepository.findOne({
-  //     relations: ['posts'],
-  //     where: { email },
-  //   });
-  // }
+  async getUserByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne({
+      relations: ['posts'],
+      where: { email },
+    });
+  }
 
   private async getUserByEmailPrivate(email: string): Promise<User> {
     return await this.userRepository
@@ -69,7 +69,10 @@ export class UsersService {
       .getOne();
   }
 
-  async validateUser(userDto: CreateUserDto | UpdateUserDto, email?: string) {
+  async validateUser(
+    userDto: CreateUserDto | UpdateUserDto,
+    email?: string,
+  ): Promise<User> {
     let userEmail: string = email ?? userDto.email;
     const user = await this.getUserByEmailPrivate(userEmail);
 

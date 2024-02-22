@@ -12,6 +12,7 @@ import { UserRole } from '../enums';
 import { passwordRegEx } from 'src/common/constants/global.constants';
 
 export class CreateUserDto {
+  @IsOptional()
   photoPath?: string;
 
   @IsNotEmpty()

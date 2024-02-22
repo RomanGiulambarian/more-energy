@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'path';
+
+import { UsersModule } from './users/users.module';
 import { ExerciseModule } from './exercise/exercise.module';
 import { ExerciseStepsModule } from './exercise-steps/exercise-steps.module';
 import { exportEntites } from './db';
 import { FavoritesModule } from './favorites/favorites.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import * as path from 'path';
 import { MediaModule } from './media/media.module';
 
 @Module({

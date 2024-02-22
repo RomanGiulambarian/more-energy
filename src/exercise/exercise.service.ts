@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+
+import { MediaService } from 'src/media/media.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Exercise } from './entities/exercise.entity';
-import { MediaService } from 'src/media/media.service';
-import { Express } from 'express';
 
 @Injectable()
 export class ExerciseService {
@@ -18,10 +18,11 @@ export class ExerciseService {
   async create(
     createExerciseDto: CreateExerciseDto,
     image: Express.Multer.File,
-  ) {
+  ): Promise<Exercise> {
     const createdExercise = await this.exerciseRepository.save(
       this.exerciseRepository.create(createExerciseDto),
     );
+
     await this.mediaService.createMedia(
       [image] as Express.Multer.File[],
       createdExercise.id,
@@ -30,31 +31,56 @@ export class ExerciseService {
     return createdExercise;
   }
 
-  async findAll() {
-    return await this.exerciseRepository.find({
-      relations: ['media'],
+  findAll(): Promise<Exercise[]> {
+    return this.exerciseRepository.find({
+      relations: ['media', 'exerciseSteps'],
     });
   }
 
-  async findOne(id: string) {
-    return await this.exerciseRepository.findOne({
-      relations: ['media'],
+  findOne(id: string): Promise<Exercise> {
+    return this.exerciseRepository.findOne({
+      relations: ['media', 'exerciseSteps'],
       where: { id },
     });
   }
 
-  async update(id: string, updateExerciseDto: UpdateExerciseDto) {
-    return await this.exerciseRepository.update(id, updateExerciseDto);
+  findOneWithDeleted(id: string): Promise<Exercise> {
+    return this.exerciseRepository.findOne({
+      relations: ['media', 'exerciseSteps'],
+      where: { id },
+      withDeleted: true,
+    });
   }
 
-  async softDelete(id: string, exercise: Exercise) {
+  update(
+    id: string,
+    updateExerciseDto: UpdateExerciseDto,
+  ): Promise<UpdateResult> {
+    return this.exerciseRepository.update(id, updateExerciseDto);
+  }
+
+  async softRemove(id: string): Promise<void> {
+    const exercise = await this.findOne(id);
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise does not exist');
+    }
+
     const mediaToDelete = exercise.media.map((img) => img.id);
 
     await this.mediaService.deleteMedia(mediaToDelete);
-    await this.exerciseRepository.softDelete(id);
+    await this.exerciseRepository.softRemove(exercise);
   }
 
-  async restore(id: string): Promise<void> {
-    await this.exerciseRepository.restore(id);
+  async recover(id: string): Promise<Exercise> {
+    const exercise = await this.findOneWithDeleted(id);
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise does not exist');
+    }
+
+    this.exerciseRepository.recover(exercise);
+
+    return exercise;
   }
 }

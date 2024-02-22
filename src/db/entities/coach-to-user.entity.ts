@@ -7,8 +7,8 @@ export class СoachToUser {
   id: string;
 
   @ManyToOne(() => User, (user) => user.id)
-  userId: User;
+  user: User;
 
   @ManyToOne(() => User, (user) => user.id)
-  coachId: User;
+  coach: User;
 }

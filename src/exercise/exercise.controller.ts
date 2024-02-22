@@ -7,10 +7,10 @@ import {
   Delete,
   NotFoundException,
   Put,
-  Res,
   UploadedFile,
   ParseFilePipeBuilder,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
@@ -42,23 +42,23 @@ export class ExerciseController {
     )
     image: Express.Multer.File,
   ) {
-    return this.exerciseService.create(createExerciseDto, image);
+    return await this.exerciseService.create(createExerciseDto, image);
   }
 
   @Get()
   async findAll() {
-    return this.exerciseService.findAll();
+    return await this.exerciseService.findAll();
   }
-
+  Ы;
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const exercise = this.exerciseService.findOne(id);
+    const exercise = await this.exerciseService.findOne(id);
 
     if (!exercise) {
       throw new NotFoundException('Exercise does not exist');
-    } else {
-      return exercise;
     }
+
+    return exercise;
   }
 
   @Put(':id')
@@ -66,19 +66,12 @@ export class ExerciseController {
     @Param('id') id: string,
     @Body() updateExerciseDto: UpdateExerciseDto,
   ) {
-    return this.exerciseService.update(id, updateExerciseDto);
+    return await this.exerciseService.update(id, updateExerciseDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Res() res: Response) {
-    const exercise = await this.exerciseService.findOne(id);
-
-    if (!exercise) {
-      throw new NotFoundException('Exercise does not exist');
-    }
-
-    await this.exerciseService.softDelete(id, exercise);
-
-    res.status(204).send().end();
+  @HttpCode(204)
+  async softRemove(@Param('id') id: string) {
+    await this.exerciseService.softRemove(id);
   }
 }

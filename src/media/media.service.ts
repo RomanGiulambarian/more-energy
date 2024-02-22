@@ -1,9 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Media } from './entities/media.entity';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { Media } from './entities/media.entity';
 
 @Injectable()
 export class MediaService {
@@ -37,10 +42,7 @@ export class MediaService {
       }
       return fileNames;
     } catch (e) {
-      throw new HttpException(
-        'Ошибка при записи файла',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new InternalServerErrorException('Ошибка при записи файла');
     }
   }
 
@@ -48,8 +50,9 @@ export class MediaService {
     try {
       mediaToDelete.forEach(async (mediaId) => {
         const media = await this.mediaRepository.findOneBy({ id: mediaId });
+
         if (!media) {
-          throw new HttpException('Медиа не найдено', HttpStatus.NOT_FOUND);
+          throw new NotFoundException('Медиа не найдено');
         }
 
         const filePath = path.resolve(
@@ -66,10 +69,7 @@ export class MediaService {
         await this.mediaRepository.remove(media);
       });
     } catch (e) {
-      throw new HttpException(
-        'Ошибка при удалении медиа',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new InternalServerErrorException('Ошибка при удалении медиа');
     }
   }
 }
