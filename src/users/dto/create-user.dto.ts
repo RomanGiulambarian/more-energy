@@ -12,13 +12,14 @@ import { UserRole } from '../enums';
 import { passwordRegEx } from 'src/common/constants/global.constants';
 
 export class CreateUserDto {
+  @IsOptional()
   photoPath?: string;
 
   @IsNotEmpty()
-  name?: string;
+  name: string;
 
   @IsNotEmpty()
-  surname?: string;
+  surname: string;
 
   @IsNotEmpty()
   @IsEmail({}, { message: 'Please provide valid Email.' })
@@ -30,7 +31,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   login: string;
 
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MinLength(8)

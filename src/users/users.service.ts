@@ -17,15 +17,15 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
+  create(createUserDto: CreateUserDto): Promise<User> {
     return this.userRepository.save(this.userRepository.create(createUserDto));
   }
 
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
 
-  findOne(id: string) {
+  findOne(id: string): Promise<User> {
     return this.userRepository.findOne({
       where: { id },
     });
@@ -53,23 +53,23 @@ export class UsersService {
     });
   }
 
-  softDelete(id: string) {
-    const user = this.findOne(id);
+  async softRemove(id: string): Promise<void> {
+    const user = await this.findOne(id);
 
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
 
-    this.userRepository.softDelete(id);
+    this.userRepository.softRemove(user);
   }
 
-  getUserByEmail(email: string) {
+  getUserByEmail(email: string): Promise<User> {
     return this.userRepository.findOne({
       where: { email },
     });
   }
 
-  private getUserByEmailPrivate(email: string) {
+  private getUserByEmailPrivate(email: string): Promise<User> {
     return this.userRepository
       .createQueryBuilder('user')
       .where('user.email = :email', { email })
@@ -77,7 +77,10 @@ export class UsersService {
       .getOne();
   }
 
-  async validateUser(userDto: CreateUserDto | UpdateUserDto, email?: string) {
+  async validateUser(
+    userDto: CreateUserDto | UpdateUserDto,
+    email?: string,
+  ): Promise<User> {
     let userEmail: string = email ?? userDto.email;
     const user = await this.getUserByEmailPrivate(userEmail);
 

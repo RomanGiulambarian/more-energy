@@ -53,15 +53,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: string, @Res() res: Response) {
-    const user = await this.userService.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException('User does not exist!');
-    }
-
-    this.userService.softDelete(id);
-
-    return id;
+  async remove(@Param('id') id: string) {
+    this.userService.softRemove(id);
   }
 }
