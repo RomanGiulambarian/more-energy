@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { CommonEntity } from 'src/db/entities/common.entity';
 import { ExerciseSteps } from 'src/exercise-steps/entities/exercise-steps.entity';
 import { Favorites } from 'src/favorites/entities/favorites.entity';
@@ -12,7 +12,7 @@ export class Exercise extends CommonEntity {
   @OneToMany(() => Media, (media) => media.exercise)
   media: Media[];
 
-  @ManyToOne(() => ExerciseSteps, (exerciseSteps) => exerciseSteps.exercise)
+  @OneToMany(() => ExerciseSteps, (exerciseSteps) => exerciseSteps.exercise)
   exerciseSteps: ExerciseSteps[];
 
   @Column()

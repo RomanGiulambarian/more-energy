@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { CreateExerciseStepDto } from './dto/create-exercise-step.dto';
-import { UpdateExerciseStepDto } from './dto/update-exercise-step.dto';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { CreateExerciseStepDto } from './dto/create-exercise-step.dto';
 import { ExerciseSteps } from './entities/exercise-steps.entity';
+import { ExerciseService } from 'src/exercise/exercise.service';
 
 @Injectable()
 export class ExerciseStepsService {
@@ -12,25 +17,52 @@ export class ExerciseStepsService {
     private readonly exerciseStepsRepository: Repository<ExerciseSteps>,
   ) {}
 
-  async create(createExerciseStepDto: CreateExerciseStepDto) {
-    return await this.exerciseStepsRepository.save(
+  create(createExerciseStepDto: CreateExerciseStepDto): Promise<ExerciseSteps> {
+    return this.exerciseStepsRepository.save(
       this.exerciseStepsRepository.create(createExerciseStepDto),
     );
   }
 
-  async findAll() {
-    return await this.exerciseStepsRepository.find();
+  findOne(id: string): Promise<ExerciseSteps> {
+    return this.exerciseStepsRepository.findOne({ where: { id } });
   }
 
-  async findOne(id: string) {
-    return await this.exerciseStepsRepository.findOne({ where: { id } });
+  findOneWithDeleted(id: string): Promise<ExerciseSteps> {
+    return this.exerciseStepsRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
   }
 
-  async update(id: string, updateExerciseStepDto: UpdateExerciseStepDto) {
-    return await this.exerciseStepsRepository.update(id, updateExerciseStepDto);
+  async softRemove(id: string): Promise<void> {
+    const exercise = await this.findOne(id);
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise does not exist');
+    }
+
+    await this.exerciseStepsRepository.softRemove(exercise);
   }
 
-  async remove(id: string) {
-    return await this.exerciseStepsRepository.delete(id);
+  async recover(id: string): Promise<ExerciseSteps> {
+    const exercise = await this.findOneWithDeleted(id);
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise does not exist');
+    }
+
+    this.exerciseStepsRepository.recover(exercise);
+
+    return exercise;
+  }
+
+  async deleteSteps(exerciseSteps: ExerciseSteps[]) {
+    try {
+      exerciseSteps.forEach(async (step) => {
+        await this.softRemove(step.id);
+      });
+    } catch (e: unknown) {
+      throw new InternalServerErrorException('Ошибка при удалении шагов');
+    }
   }
 }

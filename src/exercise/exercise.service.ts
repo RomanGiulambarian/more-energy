@@ -6,6 +6,8 @@ import { MediaService } from 'src/media/media.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Exercise } from './entities/exercise.entity';
+import { ExerciseSteps } from 'src/exercise-steps/entities/exercise-steps.entity';
+import { ExerciseStepsService } from 'src/exercise-steps/exercise-steps.service';
 
 @Injectable()
 export class ExerciseService {
@@ -13,6 +15,7 @@ export class ExerciseService {
     @InjectRepository(Exercise)
     private readonly exerciseRepository: Repository<Exercise>,
     private mediaService: MediaService,
+    private exerciseStepsService: ExerciseStepsService,
   ) {}
 
   async create(
@@ -59,6 +62,17 @@ export class ExerciseService {
     return this.exerciseRepository.update(id, updateExerciseDto);
   }
 
+  async exerciseStepsUpdate(
+    id: string,
+    exerciseStep: ExerciseSteps,
+  ): Promise<Exercise> {
+    const exercise = await this.findOne(id);
+
+    exercise.exerciseSteps.push(exerciseStep);
+
+    return this.exerciseRepository.save(exercise);
+  }
+
   async softRemove(id: string): Promise<void> {
     const exercise = await this.findOne(id);
 
@@ -69,6 +83,7 @@ export class ExerciseService {
     const mediaToDelete = exercise.media.map((img) => img.id);
 
     await this.mediaService.deleteMedia(mediaToDelete);
+    await this.exerciseStepsService.deleteSteps(exercise.exerciseSteps);
     await this.exerciseRepository.softRemove(exercise);
   }
 
