@@ -16,10 +16,10 @@ export class CreateUserDto {
   photoPath?: string;
 
   @IsNotEmpty()
-  name?: string;
+  name: string;
 
   @IsNotEmpty()
-  surname?: string;
+  surname: string;
 
   @IsNotEmpty()
   @IsEmail({}, { message: 'Please provide valid Email.' })
@@ -31,7 +31,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   login: string;
 
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
