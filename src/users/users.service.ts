@@ -60,11 +60,9 @@ export class UsersService {
       throw new NotFoundException('User does not exist');
     }
 
-    this.userRepository.softRemove(user);
-  }
-
-  getUserByEmail(email: string): Promise<User> {
-    return this.userRepository.findOne({
+  async getUserByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne({
+      relations: ['posts'],
       where: { email },
     });
   }
@@ -77,6 +75,10 @@ export class UsersService {
       .getOne();
   }
 
+  async validateUser(
+    userDto: CreateUserDto | UpdateUserDto,
+    email?: string,
+  ): Promise<User> {
   async validateUser(
     userDto: CreateUserDto | UpdateUserDto,
     email?: string,

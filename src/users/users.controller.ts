@@ -11,12 +11,15 @@ import {
   Post,
   HttpCode,
 } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+
 import { extendedRequest } from 'src/common/types/global.types';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
+@ApiTags('Users')
 @Controller('user')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
