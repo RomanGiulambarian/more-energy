@@ -59,6 +59,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
+  }
 
   async getUserByEmail(email: string): Promise<User> {
     return await this.userRepository.findOne({
@@ -75,10 +76,6 @@ export class UsersService {
       .getOne();
   }
 
-  async validateUser(
-    userDto: CreateUserDto | UpdateUserDto,
-    email?: string,
-  ): Promise<User> {
   async validateUser(
     userDto: CreateUserDto | UpdateUserDto,
     email?: string,

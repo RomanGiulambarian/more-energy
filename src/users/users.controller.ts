@@ -6,13 +6,11 @@ import {
   Delete,
   NotFoundException,
   Put,
-  Res,
   Req,
   Post,
   HttpCode,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 
 import { extendedRequest } from 'src/common/types/global.types';
 import { UpdateUserDto } from './dto/update-user.dto';
