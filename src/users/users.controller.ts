@@ -9,6 +9,7 @@ import {
   Res,
   Req,
   Post,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -34,7 +35,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string) {
+  async getById(@Param('id', new ParseUUIDPipe()) id: string) {
     const user = await this.userService.findOne(id);
 
     if (!user) {
@@ -46,7 +47,7 @@ export class UsersController {
 
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Req() req: extendedRequest,
   ) {
@@ -54,7 +55,10 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Res() res: Response) {
+  async remove(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Res() res: Response,
+  ) {
     const user = await this.userService.findOne(id);
 
     if (!user) {

@@ -8,7 +8,6 @@ import { Repository } from 'typeorm';
 
 import { CreateExerciseStepDto } from './dto/create-exercise-step.dto';
 import { ExerciseSteps } from './entities/exercise-steps.entity';
-import { ExerciseService } from 'src/exercise/exercise.service';
 
 @Injectable()
 export class ExerciseStepsService {
@@ -24,7 +23,7 @@ export class ExerciseStepsService {
   }
 
   findOne(id: string): Promise<ExerciseSteps> {
-    return this.exerciseStepsRepository.findOne({ where: { id } });
+    return this.exerciseStepsRepository.findOneBy({ id });
   }
 
   findOneWithDeleted(id: string): Promise<ExerciseSteps> {
@@ -34,7 +33,7 @@ export class ExerciseStepsService {
     });
   }
 
-  async softRemove(id: string): Promise<void> {
+  async softRemove(id: string): Promise<object> {
     const exercise = await this.findOne(id);
 
     if (!exercise) {
@@ -42,6 +41,8 @@ export class ExerciseStepsService {
     }
 
     await this.exerciseStepsRepository.softRemove(exercise);
+
+    return { id, deleted: true };
   }
 
   async recover(id: string): Promise<ExerciseSteps> {

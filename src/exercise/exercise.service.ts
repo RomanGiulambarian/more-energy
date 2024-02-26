@@ -73,7 +73,7 @@ export class ExerciseService {
     return this.exerciseRepository.save(exercise);
   }
 
-  async softRemove(id: string): Promise<void> {
+  async softRemove(id: string): Promise<object> {
     const exercise = await this.findOne(id);
 
     if (!exercise) {
@@ -85,6 +85,8 @@ export class ExerciseService {
     await this.mediaService.deleteMedia(mediaToDelete);
     await this.exerciseStepsService.deleteSteps(exercise.exerciseSteps);
     await this.exerciseRepository.softRemove(exercise);
+
+    return { id, deleted: true };
   }
 
   async recover(id: string): Promise<Exercise> {
