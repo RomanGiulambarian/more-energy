@@ -8,6 +8,7 @@ import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Exercise } from './entities/exercise.entity';
 import { ExerciseSteps } from 'src/exercise-steps/entities/exercise-steps.entity';
 import { ExerciseStepsService } from 'src/exercise-steps/exercise-steps.service';
+import { DeletedResponseDto } from 'src/common/dto';
 
 @Injectable()
 export class ExerciseService {
@@ -73,7 +74,7 @@ export class ExerciseService {
     return this.exerciseRepository.save(exercise);
   }
 
-  async softRemove(id: string): Promise<object> {
+  async softRemove(id: string): Promise<DeletedResponseDto> {
     const exercise = await this.findOne(id);
 
     if (!exercise) {
@@ -86,7 +87,7 @@ export class ExerciseService {
     await this.exerciseStepsService.deleteSteps(exercise.exerciseSteps);
     await this.exerciseRepository.softRemove(exercise);
 
-    return { id, deleted: true };
+    return new DeletedResponseDto(id, true);
   }
 
   async recover(id: string): Promise<Exercise> {

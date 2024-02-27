@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 
 import { CreateExerciseStepDto } from './dto/create-exercise-step.dto';
 import { ExerciseSteps } from './entities/exercise-steps.entity';
+import { DeletedResponseDto } from 'src/common/dto';
 
 @Injectable()
 export class ExerciseStepsService {
@@ -33,7 +34,7 @@ export class ExerciseStepsService {
     });
   }
 
-  async softRemove(id: string): Promise<object> {
+  async softRemove(id: string): Promise<DeletedResponseDto> {
     const exercise = await this.findOne(id);
 
     if (!exercise) {
@@ -42,7 +43,7 @@ export class ExerciseStepsService {
 
     await this.exerciseStepsRepository.softRemove(exercise);
 
-    return { id, deleted: true };
+    return new DeletedResponseDto(id, true);
   }
 
   async recover(id: string): Promise<ExerciseSteps> {
