@@ -11,8 +11,8 @@ services:
     environment:
        PG_DATA: /var/lib/postgresql/data
     image: postgres:16.1-alpine
-    volumes:
-        - ./pgdata:/var/lib/postgresql/data
+    # volumes:
+    #     - ./pgdata:/var/lib/postgresql/data
   server:
     working_dir: /app 
     build:

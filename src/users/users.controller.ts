@@ -8,6 +8,7 @@ import {
   Put,
   Req,
   Post,
+  ParseUUIDPipe,
   HttpCode,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -33,7 +34,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string) {
+  async getById(@Param('id', new ParseUUIDPipe()) id: string) {
     const user = await this.userService.findOne(id);
 
     if (!user) {
@@ -45,7 +46,7 @@ export class UsersController {
 
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Req() req: extendedRequest,
   ) {

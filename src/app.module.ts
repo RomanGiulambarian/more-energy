@@ -6,7 +6,6 @@ import * as path from 'path';
 
 import { UsersModule } from './users/users.module';
 import { ExerciseModule } from './exercise/exercise.module';
-import { ExerciseStepsModule } from './exercise-steps/exercise-steps.module';
 import { exportEntites } from './db';
 import { FavoritesModule } from './favorites/favorites.module';
 import { MediaModule } from './media/media.module';
@@ -32,7 +31,6 @@ import { MediaModule } from './media/media.module';
     }),
     UsersModule,
     ExerciseModule,
-    ExerciseStepsModule,
     FavoritesModule,
     MediaModule,
   ],
