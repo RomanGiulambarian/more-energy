@@ -12,9 +12,7 @@ import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-    }),
+    ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname),
     }),
@@ -28,7 +26,6 @@ import { MediaModule } from './media/media.module';
         username: configService.getOrThrow('POSTGRES_USER'),
         password: configService.getOrThrow('POSTGRES_PASSWORD'),
         entities: exportEntites,
-        synchronize: false,
         migrations: ['./db/migrations/*.{js,ts}'],
       }),
     }),

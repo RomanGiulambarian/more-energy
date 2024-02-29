@@ -6,13 +6,12 @@ import {
   Delete,
   NotFoundException,
   Put,
-  Res,
   Req,
   Post,
   ParseUUIDPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 
 import { extendedRequest } from 'src/common/types/global.types';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -40,9 +39,9 @@ export class UsersController {
 
     if (!user) {
       throw new NotFoundException('User does not exist');
-    } else {
-      return user;
     }
+
+    return user;
   }
 
   @Put(':id')
@@ -55,18 +54,8 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Res() res: Response,
-  ) {
-    const user = await this.userService.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException('User does not exist!');
-    }
-
-    await this.userService.remove(id);
-
-    res.status(204).send().end();
+  @HttpCode(204)
+  async remove(@Param('id') id: string) {
+    this.userService.softRemove(id);
   }
 }
